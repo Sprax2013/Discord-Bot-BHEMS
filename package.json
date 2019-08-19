@@ -1,0 +1,18 @@
+{
+    "name": "discord-bot-bhems",
+    "version": "0.1.0-SNAPSHOT",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon --ignore ./storage"
+    },
+    "author": "Sprax2013",
+    "license": "MIT",
+    "dependencies": {
+        "discord.js": "^11.5.1",
+        "nodemon": "^1.19.1",
+        "os-utils": "0.0.14",
+        "request": "^2.88.0"
+    }
+}
