@@ -606,7 +606,7 @@ async function nextMemberStep(member) {
     let userStorage = users[member.id] || (users[member.id] = {});
 
     if (!userStorage['FullName']) {
-        member.send('Bitte nenne mir deinen vollen Namen. Also zum Beispiel `Max Mustermann`');
+        member.send('\n\nBitte nenne mir deinen vollen Namen. Also zum Beispiel `Max Mustermann`');
     } else if (!userStorage['LK1']) {
         member.send('Bitte nenne mir deinen Schwerpunkt.\nVerfügbar: ```MarkDown\n* Wirtschaft 1 (Wi 1)\n* Wirtschaft 2 (Wi 2)\n* Gesundheit 1 (Ge 1)\n* Gesundheit 2 (Ge 2)\n* Elektrotechnik (Et)\n* Datenverarbeitung (Dv)\n* Ernährung (Ök)```');
     } else if (!userStorage['LK2']) {
@@ -639,7 +639,7 @@ async function nextMemberStep(member) {
                 .setColor(0xFFFF33)
 
                 .setTitle('Dein Profil')
-                .setDescription('**Bitte bestätige die folgende Angaben mit dem Klick auf eines der Symbole unten**\n*Sollte etwas nicht stimmen, beginnt die Fragerei von Vorne!*').addBlankField()
+                .setDescription('**Bitte bestätige die folgenden Angaben mit dem Klick auf eines der Symbole unten**\n*Sollte etwas nicht stimmen, beginnt die Fragerei von Vorne!*').addBlankField()
 
                 .addField('Vollständiger Name', userStorage['FullName'])
                 .addField('Schwerpunkt', tempMapper[userStorage['LK1']])
@@ -668,7 +668,7 @@ async function nextMemberStep(member) {
                     console.error(err);
                 }
 
-                await member.send('⚠ *Dein Nickname konnte nicht gesetzt werden!* - Bitte setze ihn manuell auf `' + userStorage['FullName'] + '`');
+                await member.send('⚠ *Dein Nickname konnte nicht gesetzt werden!* - Bitte schreib uns im #anmeldung-Kanal mit @Moderator oder @Admin an.');
             });
         }
 
