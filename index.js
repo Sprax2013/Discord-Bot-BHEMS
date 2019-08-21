@@ -30,9 +30,11 @@ if (!fs.existsSync('./storage/awaitApproval.json')) {
 }
 // }
 
-const cfg = require('./storage/config.json');
-const users = require('./storage/users.json');
-const awaitApproval = require('./storage/awaitApproval.json');
+const cfg = require('./storage/config.json'),
+    users = require('./storage/users.json'),
+    awaitApproval = require('./storage/awaitApproval.json');
+
+const names = fs.existsSync('./storage/names.json') ? require('./storage/names.json') : null;
 
 /* module.exports */
 
@@ -247,15 +249,57 @@ client.on('message', async (msg) => {
         if (msg.content.toLowerCase() == 'delete me') {
             delete users[msg.author.id];
             filesChanged = true;
-            return firstMemberStep();
+            return firstMemberStep(msg.author);
         }
 
         let userStorage = users[msg.author.id] || (users[msg.author.id] = {});
 
         if (!userStorage['FullName']) {
-            userStorage['FullName'] = msg.content;
+            const inputArgs = msg.content.split(' ');
 
-            filesChanged = true;
+            let success = !names;
+            let fullName = success ? msg.content : null;
+
+            if (!success) {
+                for (const nameObj of names) {
+                    let matches = 0;
+
+                    for (const nameArg of inputArgs) {
+                        if (nameObj['incorrect']) {
+                            if (nameObj['name'].toLowerCase().startsWith(nameArg.toLowerCase()) ||
+                                nameObj['familyName'].toLowerCase().startsWith(nameArg.toLowerCase())
+                                ||
+                                nameObj['name'].toLowerCase().split(/(?:-| )/g).includes(nameArg.toLowerCase()) ||
+                                nameObj['familyName'].toLowerCase().split(/(?:-| )/g).includes(nameArg.toLowerCase())) {
+                                matches++;
+                            }
+                        } else {
+                            if (nameObj['name'].toLowerCase() == nameArg.toLowerCase() ||
+                                nameObj['familyName'].toLowerCase() == nameArg.toLowerCase()
+                                ||
+                                nameObj['name'].toLowerCase().split(/(?:-| )/g).includes(nameArg.toLowerCase()) ||
+                                nameObj['familyName'].toLowerCase().split(/(?:-| )/g).includes(nameArg.toLowerCase())) {
+                                matches++;
+                            }
+                        }
+
+                        if (matches >= 2) {
+                            fullName = `${nameObj['name']} ${nameObj['familyName']}`;
+                            success = true;
+                            break;
+                        }
+                    }
+
+                    if (success) break;
+                }
+            }
+
+            if (success) {
+                userStorage['FullName'] = fullName;
+                filesChanged = true;
+            } else {
+                return msg.author.send('Dein Name wurde nicht auf der Namensliste gefunden!\nBitte achte auf die Schreibweise.\n\n Bitte schreib uns bei Problemen im #anmeldung-Kanal mit @Moderator oder @Admin an.');
+            }
         } else if (!userStorage['LK1']) {
             if (msg.content.toLowerCase() == 'wi 1' || msg.content.toLowerCase() == 'wi1' ||
                 msg.content.toLowerCase() == 'wirtschaft 1' || msg.content.toLowerCase() == 'wirtschaft1') {
@@ -346,7 +390,8 @@ client.on('message', async (msg) => {
 
             filesChanged = true;
         } else if (!userStorage['Science']) {
-            if (msg.content.toLowerCase() != 'keine' && msg.content.toLowerCase() != '-' && msg.content.toLowerCase() != 'none') {
+            if (msg.content.toLowerCase() != 'keine' && msg.content.toLowerCase() != '-'
+                && msg.content.toLowerCase() != 'none' && msg.content.toLowerCase() != 'nein' && msg.content.toLowerCase() != 'no') {
                 if (msg.content.toLowerCase() == 'ph 1' || msg.content.toLowerCase() == 'ph1' ||
                     msg.content.toLowerCase() == 'physik 1' || msg.content.toLowerCase() == 'physik1') {
                     userStorage['Science'] = '611215630250541086';  // Physik 1
@@ -364,46 +409,26 @@ client.on('message', async (msg) => {
             }
 
             filesChanged = true;
+        } else if (!userStorage['Spanish']) {
+            userStorage['Spanish'] = msg.content.toLowerCase() != 'keine' && msg.content.toLowerCase() != '-' && msg.content.toLowerCase() != 'none'
+                && msg.content.toLowerCase() != 'nein' && msg.content.toLowerCase() != 'no' ? '611223896573739010' : '-';
+            filesChanged = true;
         } else if (!userStorage['Misc']) {
-            if (msg.content.toLowerCase() != 'keine' && msg.content.toLowerCase() != '-' && msg.content.toLowerCase() != 'none') {
-                let arr = [];
+            if (msg.content.toLowerCase() != 'keine' && msg.content.toLowerCase() != '-'
+                && msg.content.toLowerCase() != 'none' && msg.content.toLowerCase() != 'nein' && msg.content.toLowerCase() != 'no') {
 
-                for (const s of msg.content.toLowerCase().split(',')) {
-                    if (s.trim()) {
-                        arr.push(s.trim());
-                    }
+
+                if (msg.content.toLowerCase() == 'bili' || msg.content.toLowerCase() == 'bilingual') {
+                    userStorage['Misc'] = '611223756173607008';  // Bilingual
+                } else if (msg.content.toLowerCase() == 'ku' || msg.content.toLowerCase() == 'kunst') {
+                    userStorage['Misc'] = '611223818660216833';  // Kunst
+                } else if (msg.content.toLowerCase() == 'th' || msg.content.toLowerCase() == 'theater' || msg.content.toLowerCase() == 'theaterpädagogik') {
+                    userStorage['Misc'] = '611224058436124672';  // Theaterpädagogik
+                } else {
+                    return msg.author.send('Unbekannter Kurs. Verfügbar: ```MarkDown\n* Bilingual (bili)\n* Kunst (ku)\n* Theaterpädagogik (th)```');
                 }
-
-                let knownArray = [],
-                    unknownArr = [];
-
-                for (const s of arr) {
-                    if (s.toLowerCase() == 'sp' || s.toLowerCase() == 'spanisch') {
-                        knownArray.push('611223896573739010');  // Spanisch
-                    } else if (s.toLowerCase() == 'bili' || s.toLowerCase() == 'bilingual') {
-                        knownArray.push('611223756173607008');  // Bilingual
-                    } else if (s.toLowerCase() == 'ku' || s.toLowerCase() == 'kunst') {
-                        knownArray.push('611223818660216833');  // Kunst
-                    } else if (s.toLowerCase() == 'th' || s.toLowerCase() == 'theater' || s.toLowerCase() == 'theaterpädagogik') {
-                        knownArray.push('611224058436124672');  // Theaterpädagogik
-                    } else {
-                        unknownArr.push(s);
-                    }
-                }
-
-                if (unknownArr.length > 0) {
-                    let txt = 'Unbekannte' + (unknownArr.length > 1 ? '' : 'r') + ' Kurs' + (unknownArr.length > 1 ? 'e' : '') + ': ```Markdown\n';
-                    for (const s of unknownArr) {
-                        txt += '* ' + s + '\n';
-                    }
-                    txt += '```';
-
-                    return msg.author.send(txt + '\nVerfügbar: ```MarkDown\n* Spanisch (sp)\n* Bilingual (bili)\n* Kunst (ku)\n* Theaterpädagogik (th)```');
-                }
-
-                userStorage['Misc'] = knownArray;
             } else {
-                userStorage['Misc'] = [];
+                userStorage['Misc'] = '-';
             }
 
             filesChanged = true;
@@ -617,23 +642,11 @@ async function nextMemberStep(member) {
         member.send('Bitte nenne mir deinen Ethik- oder Religionskurs.\nVerfügbar: ```MarkDown\n* Ethik 1 (ek1)\n* Ethik 2 (ek2)\n* Evangelisch 1 (rv1)\n* Evangelisch 2 (rv2)\n* Katholisch (rk1)```');
     } else if (!userStorage['Science']) {
         member.send('Bitte nenne mir deine Naturwissenschaft oder **Keine**.\nVerfügbar: ```MarkDown\n* Physik 1 (ph1)\n* Physik 2 (ph2)\n* Chemie (ch1)```');
+    } else if (!userStorage['Spanish']) {
+        member.send('Hast du Spanisch? (*Ja* oder *Nein*)');
     } else if (!userStorage['Misc']) {
-        member.send('Bitte liste mir deine weiteren Kurse auf *(z.B. `Spanisch, Kunst`)* oder schreibe **Keine**. Verfügbar: ```MarkDown\n* Spanisch (sp)\n* Bilingual (bili)\n* Kunst (ku)\n* Theaterpädagogik (th)```');
+        member.send('Bitte liste mir deine weiteren Kurse auf *(z.B. `Spanisch, Kunst`)* oder schreibe **Keine**. Verfügbar: ```MarkDown\n* Bilingual (bili)\n* Kunst (ku)\n* Theaterpädagogik (th)```');
     } else if (!userStorage['Approved']) {
-        let misc = '-';
-
-        if (userStorage['Misc'].length > 0) {
-            for (const roleID of userStorage['Misc']) {
-                if (misc == '-') {
-                    misc = '';
-                } else {
-                    misc += ', ';
-                }
-
-                misc += tempMapper[roleID];
-            }
-        }
-
         const embedMsg = await member.send(
             new dc.RichEmbed()
                 .setColor(0xFFFF33)
@@ -646,10 +659,12 @@ async function nextMemberStep(member) {
                 .addField('Leistungskurs', tempMapper[userStorage['LK2']])
                 .addField('Sportkurs', tempMapper[userStorage['PE']])
                 .addField('Ethik- oder Religionskurs', tempMapper[userStorage['Religion']])
-                .addField('Naturwissenschaft', (userStorage['Science'] == '-' ? '-' : tempMapper[userStorage['Science']]))
-                .addField('Weitere Kurse', misc)
+                .addField('Naturwissenschaft', (userStorage['Science'] == '-' ? 'Keine' : tempMapper[userStorage['Science']]))
+                .addField('Spanisch', (userStorage['Spanish'] == '-' ? 'Nein' : tempMapper[userStorage['Spanish']]))
+                .addField('Weitere Kurse', tempMapper[userStorage['Misc']])
 
-                .setFooter(`~${member.username}`, member.avatarURL)
+                .setFooter(`~${member instanceof dc.GuildMember ? member.user.username : member.username}`,
+                    member instanceof dc.GuildMember ? member.user.avatarURL : member.avatarURL)
         );
 
         awaitApproval[member.id] = embedMsg.id;
@@ -664,7 +679,7 @@ async function nextMemberStep(member) {
 
         if (guildMember.nickname && guildMember.nickname != userStorage['FullName']) {
             await guildMember.setNickname(userStorage['FullName']).catch(async (err) => {
-                if (!err.code == 50013) {
+                if (err.code != 50013) {
                     console.error(err);
                 }
 
@@ -681,10 +696,12 @@ async function nextMemberStep(member) {
             await guildMember.addRole(userStorage['Science']).catch(console.error);
         }
 
-        if (userStorage['Misc'].length > 0) {
-            for (const roleID of userStorage['Misc']) {
-                await guildMember.addRole(roleID).catch(console.error);
-            }
+        if (userStorage['Spanish'] != '-') {
+            await guildMember.addRole(userStorage['Spanish']).catch(console.error);
+        }
+
+        if (userStorage['Misc'] != '-') {
+            await guildMember.addRole(userStorage['Misc']).catch(console.error);
         }
 
         userStorage['GaveRoles'] = true;
