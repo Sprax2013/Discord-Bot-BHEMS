@@ -665,7 +665,7 @@ async function nextMemberStep(member) {
     } else if (!userStorage['Spanish']) {
         member.send('Hast du Spanisch? (*Ja* oder *Nein*)');
     } else if (!userStorage['Misc']) {
-        member.send('Bitte liste mir deine weiteren Kurse auf *(z.B. `Spanisch, Kunst`)* oder schreibe **Keine**. Verfügbar: ```MarkDown\n* Bilingual (bili)\n* Kunst (ku)\n* Theaterpädagogik (th)```');
+        member.send('Bitte nenne mir deinen weiteren Kurs oder schreibe **Keine**. Verfügbar: ```MarkDown\n* Bilingual (bili)\n* Kunst (ku)\n* Theaterpädagogik (th)```');
     } else if (!userStorage['Approved']) {
         const embedMsg = await member.send(
             new dc.RichEmbed()
@@ -681,7 +681,7 @@ async function nextMemberStep(member) {
                 .addField('Ethik- oder Religionskurs', tempMapper[userStorage['Religion']])
                 .addField('Naturwissenschaft', (userStorage['Science'] == '-' ? 'Keine' : tempMapper[userStorage['Science']]))
                 .addField('Spanisch', (userStorage['Spanish'] == '-' ? 'Nein' : tempMapper[userStorage['Spanish']]))
-                .addField('Weitere Kurse', tempMapper[userStorage['Misc']])
+                .addField('Weitere Kurse', userStorage['Misc'] == '-' ? 'Keine' : tempMapper[userStorage['Misc']])
 
                 .setFooter(`~${member instanceof dc.GuildMember ? member.user.username : member.username}`,
                     member instanceof dc.GuildMember ? member.user.avatarURL : member.avatarURL)
