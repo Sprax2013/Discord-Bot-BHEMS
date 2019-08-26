@@ -431,9 +431,17 @@ client.on('message', async (msg) => {
 
             filesChanged = true;
         } else if (!userStorage['Spanish']) {
-            userStorage['Spanish'] = msg.content.toLowerCase() != 'keine' && msg.content.toLowerCase() != '-' && msg.content.toLowerCase() != 'none'
-                && msg.content.toLowerCase() != 'nein' && msg.content.toLowerCase() != 'no' ? '611223896573739010' : '-';
-            filesChanged = true;
+            if (msg.content.toLowerCase() == 'ja' || msg.content.toLowerCase() == 'yes' || msg.content.toLowerCase() == '1' ||
+                msg.content.toLowerCase() == 'true' || msg.content.toLowerCase() == 't' || msg.content.toLowerCase() == 'y') {
+                userStorage['Spanish'] = '611223896573739010';
+                filesChanged = true;
+            } else if (msg.content.toLowerCase() == 'nein' || msg.content.toLowerCase() == 'no' || msg.content.toLowerCase() == '0' ||
+                msg.content.toLowerCase() == 'false' || msg.content.toLowerCase() == 'f' || msg.content.toLowerCase() == 'n') {
+                userStorage['Spanish'] = '-';
+                filesChanged = true;
+            } else {
+                msg.author.send('Ungültige Eingabe! Bitte schreibe `Ja` oder `Nein`');
+            }
         } else if (!userStorage['Misc']) {
             if (msg.content.toLowerCase() != 'keine' && msg.content.toLowerCase() != '-'
                 && msg.content.toLowerCase() != 'none' && msg.content.toLowerCase() != 'nein' && msg.content.toLowerCase() != 'no') {
