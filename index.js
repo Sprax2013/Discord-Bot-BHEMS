@@ -296,7 +296,27 @@ client.on('message', async (msg) => {
             }
 
             if (success) {
-                userStorage['FullName'] = fullName;
+                let alreadyRegistered = false;
+
+                if (names) {
+                    for (const key in users) {
+                        if (users.hasOwnProperty(key)) {
+                            const userObj = users[key];
+
+                            if (fullName == userObj['_FullNameFromNameList'] && !userObj['GaveRoles']) {
+                                alreadyRegistered = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (alreadyRegistered) {
+                    return msg.author.send('Dein Name ist bereits auf dem Server verwendet worden! Sollte es sich um einen Fehler handeln, melde dich bitte in #anmeldung auf dem Server!');
+                }
+
+                userStorage['FullName'] = msg.content;
+                userStorage['_FullNameFromNameList'] = fullName;
                 filesChanged = true;
             } else {
                 return msg.author.send('Dein Name wurde nicht auf der Namensliste gefunden!\nBitte achte auf die Schreibweise.\n\n Bitte schreib uns bei Problemen im #anmeldung-Kanal mit @Moderator oder @Admin an.');
@@ -417,7 +437,6 @@ client.on('message', async (msg) => {
         } else if (!userStorage['Misc']) {
             if (msg.content.toLowerCase() != 'keine' && msg.content.toLowerCase() != '-'
                 && msg.content.toLowerCase() != 'none' && msg.content.toLowerCase() != 'nein' && msg.content.toLowerCase() != 'no') {
-
 
                 if (msg.content.toLowerCase() == 'bili' || msg.content.toLowerCase() == 'bilingual') {
                     userStorage['Misc'] = '611223756173607008';  // Bilingual
@@ -676,6 +695,26 @@ async function nextMemberStep(member) {
         await embedMsg.react('❌')
             .catch(console.error);
     } else if (!userStorage['GaveRoles']) {
+        let alreadyRegistered = false;
+
+        if (names) {
+            for (const key in users) {
+                if (users.hasOwnProperty(key)) {
+                    const userObj = users[key];
+
+                    if (fullName == userObj['_FullNameFromNameList'] && !userObj['GaveRoles']) {
+                        alreadyRegistered = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (alreadyRegistered) {
+            return msg.author.send('Dein Name ist bereits auf dem Server verwendet worden! Sollte es sich um einen Fehler handeln, melde dich bitte in #anmeldung auf dem Server!');
+        }
+
+
         const guildMember = await servingGuild.fetchMember(member);
 
         if (guildMember.nickname && guildMember.nickname != userStorage['FullName']) {
