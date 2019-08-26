@@ -160,6 +160,7 @@ client.on('ready', () => {
     module.exports.client = client;
 
     updateBotActivity();
+    setInterval(updateBotActivity, 900000); // 15min
 });
 
 client.on('error', (err) => {
