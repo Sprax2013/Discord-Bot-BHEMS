@@ -725,7 +725,7 @@ async function nextMemberStep(member) {
 
         const guildMember = await servingGuild.fetchMember(member);
 
-        if (guildMember.nickname && guildMember.nickname != userStorage['FullName']) {
+        if (!guildMember.nickname || guildMember.nickname != userStorage['FullName']) {
             await guildMember.setNickname(userStorage['FullName']).catch(async (err) => {
                 if (err.code != 50013) {
                     console.error(err);
