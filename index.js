@@ -703,24 +703,24 @@ async function nextMemberStep(member) {
         await embedMsg.react('❌')
             .catch(console.error);
     } else if (!userStorage['GaveRoles']) {
-        let alreadyRegistered = false;
+        // let alreadyRegistered = false;
 
-        if (names) {
-            for (const key in users) {
-                if (users.hasOwnProperty(key)) {
-                    const userObj = users[key];
+        // if (names) {
+        //     for (const key in users) {
+        //         if (users.hasOwnProperty(key)) {
+        //             const userObj = users[key];
 
-                    if (fullName == userObj['_FullNameFromNameList'] && !userObj['GaveRoles']) {
-                        alreadyRegistered = true;
-                        break;
-                    }
-                }
-            }
-        }
+        //             if (fullName == userObj['_FullNameFromNameList'] && !userObj['GaveRoles']) {
+        //                 alreadyRegistered = true;
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // }
 
-        if (alreadyRegistered) {
-            return msg.author.send('Dein Name ist bereits auf dem Server verwendet worden! Sollte es sich um einen Fehler handeln, melde dich bitte in #anmeldung auf dem Server!');
-        }
+        // if (alreadyRegistered) {
+        //     return msg.author.send('Dein Name ist bereits auf dem Server verwendet worden! Sollte es sich um einen Fehler handeln, melde dich bitte in #anmeldung auf dem Server!');
+        // }
 
 
         const guildMember = await servingGuild.fetchMember(member);
