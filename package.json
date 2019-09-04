@@ -11,7 +11,7 @@
     "license": "MIT",
     "dependencies": {
         "discord.js": "^11.5.1",
-        "nodemon": "^1.19.1",
+        "nodemon": "^1.19.2",
         "os-utils": "0.0.14",
         "request": "^2.88.0"
     }
