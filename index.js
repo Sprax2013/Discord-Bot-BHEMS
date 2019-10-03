@@ -247,11 +247,11 @@ client.on('message', async (msg) => {
     if (!handleMessage(msg)) return;
 
     if (msg.channel instanceof dc.DMChannel) {
-        if (msg.content.toLowerCase() == 'delete me') {
-            delete users[msg.author.id];
-            filesChanged = true;
-            return firstMemberStep(msg.author);
-        }
+        // if (msg.content.toLowerCase() == 'delete me') {
+        //     delete users[msg.author.id];
+        //     filesChanged = true;
+        //     return firstMemberStep(msg.author);
+        // }
 
         let userStorage = users[msg.author.id] || (users[msg.author.id] = {});
 
@@ -630,9 +630,10 @@ function firstMemberStep(member) {
             '```');
 
         nextMemberStep(member);
-    } else if (!isMemberReady(member)) {
-        nextMemberStep(member);
     }
+    //  else if (!isMemberReady(member)) {
+    //     nextMemberStep(member);
+    // }
 }
 
 /**
@@ -655,7 +656,7 @@ function isMemberReady(member) {
 /**
  * @param {dc.User} member 
  */
-async function nextMemberStep(member) {
+async function nextMemberStep(member, continueSetup = true) {
     let userStorage = users[member.id] || (users[member.id] = {});
 
     if (!userStorage['FullName']) {
@@ -721,7 +722,6 @@ async function nextMemberStep(member) {
         // if (alreadyRegistered) {
         //     return msg.author.send('Dein Name ist bereits auf dem Server verwendet worden! Sollte es sich um einen Fehler handeln, melde dich bitte in #anmeldung auf dem Server!');
         // }
-
 
         const guildMember = await servingGuild.fetchMember(member);
 
