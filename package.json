@@ -10,7 +10,7 @@
     "author": "Sprax2013",
     "license": "MIT",
     "dependencies": {
-        "discord.js": "^11.5.1",
+        "discord.js": "^11.6.2",
         "nodemon": "^2.0.3",
         "os-utils": "0.0.14",
         "request": "^2.88.2"
